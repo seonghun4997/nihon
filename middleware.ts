@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-async function authToken(): Promise<string> {
-  const code = process.env.ACCESS_CODE || '';
-  const data = new TextEncoder().encode('nihon-v1::' + code);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-}
-
-export async function middleware(req: NextRequest) {
+export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (
@@ -24,7 +15,9 @@ export async function middleware(req: NextRequest) {
   }
 
   const token = req.cookies.get('jp_auth')?.value;
-  if (!token || token !== (await authToken())) {
+  const ok = !!process.env.ACCESS_CODE && token === process.env.ACCESS_CODE;
+
+  if (!ok) {
     if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
     }
