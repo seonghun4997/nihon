@@ -13,7 +13,7 @@ export const maxDuration = 30;
 async function lessonContext(studentId: string, lang: string) {
   const { data: lesson } = await db().from('lessons').select('id, title, note')
     .eq('student_id', studentId).eq('lang', lang).order('lesson_date', { ascending: false }).limit(1).maybeSingle();
-  if (!lesson) return { lessonId: null as string | null, context: '', expressions: [] as string[] };
+  if (!lesson) return { lessonId: null as string | null, context: '아직 수업 기록 없음 — 여행 일상 장면(공항·호텔·식당·길묻기)으로 가벼운 첫 대화를 시작하세요.', expressions: [] as string[] };
   const exprs: { jp: string; ko: string }[] = lesson.note?.expressions || [];
   return {
     lessonId: lesson.id as string,
@@ -32,7 +32,6 @@ export async function GET() {
   if (existing) return NextResponse.json(existing);
 
   const { lessonId, context } = await lessonContext(sess.id, lang);
-  if (!lessonId) return NextResponse.json({ empty: true, reason: '수업 노트가 아직 없어요. 첫 수업을 붙여넣으면 이어하기가 열립니다.' });
 
   let opener = lang === 'en' ? "Hi! How was your day?\n(힌트: It was good / A bit busy 로 답해보세요)" : 'こんにちは！最近どうですか？\n(힌트: 元気です / ちょっと忙しいです 로 답해보세요)';
   try { opener = await askClaude(TALK_SYSTEM(context, lang, (await prefOf(lang)).goal), [{ role: 'user', content: '대화를 시작해 주세요. 수업 주제를 이어가는 가벼운 질문 하나로.' }], 400); } catch {}

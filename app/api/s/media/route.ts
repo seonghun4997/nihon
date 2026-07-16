@@ -35,10 +35,11 @@ export async function POST(req: NextRequest) {
     try {
       const out = await askClaude(MEDIA_REC_SYSTEM(lang, goal, exclude), [{ role: 'user', content: '오늘의 추천 1개' }], 1500);
       const rec = parseJSON<any>(out);
-      const { data } = await s.from('media_recs').insert({
+      const { data, error } = await s.from('media_recs').insert({
         student_id: sess.id, lang, title: rec.title || '', kind: rec.kind || '',
         why: rec.why || '', how: rec.how || '', expressions: rec.expressions || [],
       }).select().single();
+      if (error || !data) return NextResponse.json({ error: '저장 실패: ' + (error?.message || 'unknown') }, { status: 500 });
       return NextResponse.json({ ok: true, item: data });
     } catch (e: any) {
       return NextResponse.json({ error: '추천 생성 실패 — 다시 시도해 주세요.' }, { status: 502 });

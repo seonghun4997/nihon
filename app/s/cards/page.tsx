@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import AddWord from '@/components/AddWord';
 
 type Speak = { id: string; text: string; reading: string; ko: string; stage: number };
 type Word = { id: string; word: string; reading: string; meaning: string; stage: number; requeued?: boolean };
@@ -260,6 +261,7 @@ export default function Cards() {
           <p className="desc">막힌 표현은 입으로 나올 때까지 다시 옵니다. 이제 앱을 닫아도 돼요.</p>
         </div>
       )}
+      <AddWord />
     </Shell>
   );
 }

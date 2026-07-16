@@ -1,5 +1,6 @@
 import { db } from '@/lib/supabase';
 import { getSession, OWNER_ID } from '@/lib/session';
+import { ensureSeed } from '@/lib/seed';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,7 @@ export default async function Status({ searchParams }: { searchParams: { key?: s
 
   // 1. 환경변수
   const url = process.env.SUPABASE_URL || '';
-  const urlOK = /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(url);
+  const urlOK = /^https:\/\//i.test(url.trim()) && url.includes('.supabase.co');
   checks.push({ name: 'ACCESS_CODE 등록', ok: !!process.env.ACCESS_CODE, fix: 'Vercel 환경변수에 ACCESS_CODE 추가 후 Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   checks.push({ name: 'SUPABASE_URL 형식 (https://xxxx.supabase.co)', ok: !!url && urlOK, fix: 'Supabase → Settings → API의 Project URL을 복사해 교체 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   checks.push({ name: 'SUPABASE_SERVICE_ROLE_KEY 등록', ok: !!process.env.SUPABASE_SERVICE_ROLE_KEY, fix: 'Supabase → Settings → API의 service_role 키(secret) 등록 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
@@ -19,6 +20,7 @@ export default async function Status({ searchParams }: { searchParams: { key?: s
 
   // 2. DB 연결 + 테이블 + 시드 (인증된 경우만 실제 조회)
   let dbReach: boolean | null = null, tables: boolean | null = null, seeded: boolean | null = null;
+  let seedReason = '';
   if (authed && url && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       const { error } = await db().from('users').select('id', { count: 'exact', head: true });
@@ -33,8 +35,10 @@ export default async function Status({ searchParams }: { searchParams: { key?: s
         ]);
         tables = !e1 && !e2;
         if (tables) {
+          const seedErr = await ensureSeed(); // 이 페이지를 여는 것만으로 초기 데이터 자동 생성
           const { data } = await db().from('users').select('id').eq('id', OWNER_ID).maybeSingle();
           seeded = !!data;
+          if (!seeded && seedErr) seedReason = seedErr;
         }
       }
     } catch {
@@ -43,7 +47,7 @@ export default async function Status({ searchParams }: { searchParams: { key?: s
   }
   checks.push({ name: 'Supabase 연결', ok: dbReach, fix: 'SUPABASE_URL 값이 틀렸을 가능성이 커요 — 위 2번 항목 확인' });
   checks.push({ name: '테이블 설치 (all-in-one.sql)', ok: tables, fix: 'Supabase SQL Editor에 supabase/all-in-one.sql 전체 붙여넣고 Run — 이게 마지막 남은 한 번입니다', link: 'https://supabase.com/dashboard/projects' });
-  checks.push({ name: '초기 데이터 (자동 — 로그인하면 앱이 만듦)', ok: seeded, fix: '테이블 설치 후 로그인 한 번이면 자동 생성돼요' });
+  checks.push({ name: '초기 데이터 (이 페이지가 자동 생성)', ok: seeded, fix: seedReason ? `실패 원인: ${seedReason} — 이 문구를 그대로 전달해 주세요` : '이 페이지 새로고침만으로 만들어져요' });
 
   const allOK = checks.every((c) => c.ok === true);
 
