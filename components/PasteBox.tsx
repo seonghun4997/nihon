@@ -9,29 +9,21 @@ export default function PasteBox() {
   const router = useRouter();
 
   async function submit() {
-    if (busy || raw.trim().length < 50) {
-      setErr('다글로에서 전체 텍스트를 복사해 붙여넣어 주세요.');
-      return;
-    }
+    if (busy) return;
+    if (raw.trim().length < 50) { setErr('다글로에서 전체 텍스트를 복사해 붙여넣어 주세요.'); return; }
     setBusy(true); setErr('');
-    const res = await fetch('/api/jp/lessons', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ raw }),
+    const res = await fetch('/api/s/lessons', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ raw }),
     });
     const data = await res.json();
-    if (!res.ok) { setErr(data.error || '실패했어요. 다시 시도해 주세요.'); setBusy(false); return; }
-    router.push(`/jp/notes/${data.id}`);
+    if (!res.ok) { setErr(data.error || '실패했어요.'); setBusy(false); return; }
+    router.push(`/s/notes/${data.id}`);
   }
 
   return (
     <>
-      <textarea
-        className="paste"
-        placeholder="다글로 텍스트를 여기에 붙여넣기 — 한 번이면 표현·단어·문법·헷갈림으로 자동 분해돼요."
-        value={raw}
-        onChange={(e) => setRaw(e.target.value)}
-      />
+      <textarea className="paste" placeholder="다글로 텍스트를 여기에 붙여넣기 — 한 번이면 표현·단어·문법·헷갈림으로 자동 분해되고, 출석도 자동 기록돼요."
+        value={raw} onChange={(e) => setRaw(e.target.value)} />
       {err && <div className="err" style={{ marginTop: 8 }}>{err}</div>}
       <div className="row">
         <button className="btn block" onClick={submit} disabled={busy}>

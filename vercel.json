@@ -1,6 +1,6 @@
 {
   "crons": [
-    { "path": "/api/jp/cron/morning", "schedule": "0 22 * * *" },
-    { "path": "/api/jp/cron/evening", "schedule": "0 12 * * *" }
+    { "path": "/api/cron/morning", "schedule": "0 22 * * *" },
+    { "path": "/api/cron/evening", "schedule": "0 12 * * *" }
   ]
 }

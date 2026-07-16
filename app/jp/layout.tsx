@@ -1,18 +1,2 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import TabBar from '@/components/TabBar';
-
-export const dynamic = 'force-dynamic';
-
-export default function JpLayout({ children }: { children: React.ReactNode }) {
-  const token = cookies().get('jp_auth')?.value;
-  if (!process.env.ACCESS_CODE || token !== process.env.ACCESS_CODE) {
-    redirect('/login');
-  }
-  return (
-    <>
-      <div className="wrap">{children}</div>
-      <TabBar />
-    </>
-  );
-}
+// v3에서 이전됨 — 통과 레이아웃 (덮어쓰기용 스텁)
+export default function L({ children }: { children: React.ReactNode }) { return <>{children}</>; }

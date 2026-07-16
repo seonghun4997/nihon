@@ -1,17 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-export async function POST(req: NextRequest) {
-  const { code } = await req.json().catch(() => ({ code: '' }));
-  if (!process.env.ACCESS_CODE || code !== process.env.ACCESS_CODE) {
-    return NextResponse.json({ ok: false }, { status: 401 });
-  }
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set('jp_auth', process.env.ACCESS_CODE, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 365,
-  });
-  return res;
-}
+import { NextResponse } from 'next/server';
+// v2 API — v3에서 /api/s·/api/t·/api/cron 으로 이전됨
+export async function GET() { return NextResponse.json({ moved: true }, { status: 410 }); }
+export async function POST() { return NextResponse.json({ moved: true }, { status: 410 }); }
+export async function PATCH() { return NextResponse.json({ moved: true }, { status: 410 }); }

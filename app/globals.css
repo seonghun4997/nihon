@@ -261,3 +261,81 @@ h1.big em { font-style: normal; color: var(--green); }
 @media (min-width: 720px) {
   .wrap { max-width: 640px; }
 }
+
+/* ══ v2 확장 (대개편) ══ */
+.role-badge { font-size: 10px; font-weight: 800; letter-spacing: .12em; padding: 3px 9px; border-radius: 999px;
+  background: var(--card-2); border: 1px solid var(--line); color: var(--muted); text-transform: uppercase; }
+.topbar .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.linkbtn { font-size: 12px; color: var(--dim); background: none; }
+.linkbtn:hover { color: var(--text); }
+
+/* 학생 카드 그리드 (선생님용) */
+.stu-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.stu-card { background: var(--card); border: 1px solid var(--line-soft); border-radius: 16px; padding: 16px; }
+.stu-card.alert { border-color: rgba(255, 140, 100, .4); }
+.stu-head { display: flex; align-items: center; gap: 10px; }
+.stu-head .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green-soft); color: var(--green);
+  display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; }
+.stu-head b { font-size: 15px; }
+.stu-head .sub2 { font-size: 12px; color: var(--dim); }
+.stu-stats { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.stat { background: var(--card-2); border: 1px solid var(--line-soft); border-radius: 10px; padding: 7px 11px; font-size: 12px; color: var(--muted); }
+.stat b { color: var(--text); }
+.stat.good b { color: var(--green); }
+.stat.warn b { color: #ff9d76; }
+
+/* 브리핑 */
+.brief { margin-top: 12px; background: var(--panel); border: 1px solid rgba(62,221,140,.25); border-radius: 14px;
+  padding: 14px 16px; font-size: 13.5px; line-height: 1.7; white-space: pre-wrap; color: var(--text); }
+
+/* 폼 */
+.field { margin-top: 12px; }
+.field label { display: block; font-size: 12px; color: var(--dim); margin-bottom: 6px; font-weight: 700; }
+.field input, .field select, .field textarea { width: 100%; background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 11px 14px; font-size: 14px; outline: none; color: var(--text); }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(62,221,140,.5); }
+.field .row2 { display: flex; gap: 8px; }
+.checkline { display: flex; gap: 9px; align-items: flex-start; margin-top: 14px; font-size: 12.5px; color: var(--muted); }
+.checkline input { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--green); }
+
+/* 정산 */
+.inv-row { display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding: 13px 0; border-top: 1px solid var(--line-soft); font-size: 13.5px; }
+.inv-row:first-child { border-top: none; }
+.money-big { font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+.money-big small { font-size: 13px; color: var(--dim); font-weight: 600; }
+.status-pill { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; }
+.status-pill.draft { background: var(--card-2); color: var(--muted); border: 1px solid var(--line); }
+.status-pill.sent { background: rgba(120,170,255,.12); color: #8ab4ff; border: 1px solid rgba(120,170,255,.3); }
+.status-pill.paid { background: var(--green-soft); color: var(--green); border: 1px solid rgba(62,221,140,.3); }
+
+/* 슬롯 편집 */
+.slot-row { display: flex; gap: 6px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.slot-row select, .slot-row input { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 8px 10px; font-size: 13px; color: var(--text); outline: none; }
+.slot-row input.place { flex: 1; min-width: 120px; }
+.icon-x { color: var(--dim); font-size: 16px; padding: 4px 8px; }
+.icon-x:hover { color: #ff9d76; }
+
+/* 랜딩 */
+.landing { max-width: 640px; margin: 0 auto; padding: 60px 20px 80px; }
+.landing .hero h1 { font-size: 34px; font-weight: 800; letter-spacing: -.03em; line-height: 1.25; }
+.landing .hero h1 em { font-style: normal; color: var(--green); }
+.landing .hero p { color: var(--muted); margin-top: 12px; font-size: 15px; }
+.landing .cta { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+.floor { margin-top: 16px; display: flex; gap: 12px; align-items: flex-start; background: var(--card);
+  border: 1px solid var(--line-soft); border-radius: 16px; padding: 16px 18px; }
+.floor .n { color: var(--green); font-weight: 800; font-size: 13px; letter-spacing: .1em; white-space: nowrap; }
+.floor b { font-size: 14.5px; }
+.floor p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+/* 답변 스레드 */
+.t-answer { margin-top: 8px; padding-left: 11px; border-left: 2px solid var(--green); font-size: 13.5px; color: var(--text); white-space: pre-wrap; }
+.t-answer .who { font-size: 11px; color: var(--green); font-weight: 800; display: block; margin-bottom: 2px; }
+.answer-box { display: flex; gap: 8px; margin-top: 10px; }
+.answer-box input { flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+  padding: 9px 14px; font-size: 13px; outline: none; color: var(--text); min-width: 0; }
+
+.section-gap { margin-top: 28px; }
+.reaction-banner { margin-top: 12px; background: var(--green-soft); border: 1px solid rgba(62,221,140,.25);
+  border-radius: 14px; padding: 12px 15px; font-size: 13px; color: var(--text); }

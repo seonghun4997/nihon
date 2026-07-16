@@ -12,7 +12,7 @@ export default function TopicPicker({ forDate }: { forDate: string }) {
 
   async function load() {
     setState('loading');
-    const res = await fetch(`/api/jp/topics?for=${forDate}`);
+    const res = await fetch(`/api/s/topics?for=${forDate}`);
     const data = await res.json();
     if (data.empty) { setState('empty'); setMsg(data.reason); return; }
     if (!res.ok) { setState('error'); setMsg(data.error || '실패'); return; }
@@ -23,9 +23,8 @@ export default function TopicPicker({ forDate }: { forDate: string }) {
 
   async function pick(i: number) {
     setSelected(i);
-    await fetch('/api/jp/topics', {
-      method: 'PATCH',
-      headers: { 'content-type': 'application/json' },
+    await fetch('/api/s/topics', {
+      method: 'PATCH', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ for_date: forDate, selected: i }),
     });
   }
@@ -33,24 +32,12 @@ export default function TopicPicker({ forDate }: { forDate: string }) {
   async function share() {
     if (selected === null) return;
     const t = topics[selected];
-    const text =
-      `[내일 수업 주제 제안]\n주제: ${t.jp}\n방향: ${t.ko}\n` +
-      `연습하고 싶은 표현:\n${t.expressions.map((e) => `- ${e.jp} (${e.ko})`).join('\n')}`;
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {}
+    const text = `[내일 수업 주제]\n주제: ${t.jp}\n방향: ${t.ko}\n연습하고 싶은 표현:\n${t.expressions.map((e) => `- ${e.jp} (${e.ko})`).join('\n')}`;
+    try { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
   }
 
-  if (state === 'idle')
-    return (
-      <div className="row">
-        <button className="btn block" onClick={load}>내일 주제 카드 3개 받기 →</button>
-      </div>
-    );
-  if (state === 'loading')
-    return <div className="row"><button className="btn block" disabled><span className="spin" /> 최근 수업에서 주제를 뽑는 중…</button></div>;
+  if (state === 'idle') return <div className="row"><button className="btn block" onClick={load}>내일 주제 카드 3개 받기 →</button></div>;
+  if (state === 'loading') return <div className="row"><button className="btn block" disabled><span className="spin" /> 최근 수업에서 주제를 뽑는 중…</button></div>;
   if (state === 'empty' || state === 'error') return <div className="empty">{msg}</div>;
 
   return (
@@ -60,21 +47,15 @@ export default function TopicPicker({ forDate }: { forDate: string }) {
           <button key={i} className={`topic ${selected === i ? 'sel' : ''}`} onClick={() => pick(i)}>
             <span className="jp">{t.jp}</span>
             <span className="ko">{t.ko}</span>
-            {selected === i && (
-              <span className="ko" style={{ marginTop: 4 }}>
-                예습: {t.expressions.slice(0, 3).map((e) => e.jp).join(' · ')} …
-              </span>
-            )}
+            {selected === i && <span className="ko" style={{ marginTop: 4 }}>예습: {t.expressions.slice(0, 3).map((e) => e.jp).join(' · ')} …</span>}
             <span className="pick">{selected === i ? '✓ 이 주제로' : '이걸로 →'}</span>
           </button>
         ))}
       </div>
       {selected !== null && (
         <div className="row">
-          <button className="btn ghost sm" onClick={share}>
-            {copied ? '복사됐어요 ✓' : '선생님께 공유 (카톡 복사)'}
-          </button>
-          <span className="hintline">질문 박스의 ✓ 체크 질문도 함께 보면 좋아요</span>
+          <button className="btn ghost sm" onClick={share}>{copied ? '복사됐어요 ✓' : '선생님께 공유 (카톡 복사)'}</button>
+          <span className="hintline">선생님 브리핑에도 자동으로 들어가요</span>
         </div>
       )}
     </>
