@@ -3,19 +3,21 @@ import { db } from '@/lib/supabase';
 import { getSession } from '@/lib/session';
 import { formatKo } from '@/lib/dates';
 import Topbar from '@/components/Topbar';
+import { getLang } from '@/lib/lang';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Notes({ searchParams }: { searchParams: { q?: string } }) {
   const sess = getSession()!;
   const q = searchParams?.q?.trim() || '';
-  let query = db().from('lessons').select('id, lesson_date, title, note').eq('student_id', sess.id).order('lesson_date', { ascending: false }).limit(50);
+  const lang = getLang();
+  let query = db().from('lessons').select('id, lesson_date, title, note').eq('student_id', sess.id).eq('lang', lang).order('lesson_date', { ascending: false }).limit(50);
   if (q) query = query.or(`title.ilike.%${q}%,raw_text.ilike.%${q}%`);
   const { data: lessons } = await query;
 
   return (
     <>
-      <Topbar badge="학생" />
+      <Topbar lang={lang} />
       <div className="eyebrow">Lesson Notes</div>
       <h1 className="big">내 수업이 <em>교재</em>다</h1>
       <form className="ask" action="/s/notes" method="get">

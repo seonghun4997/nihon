@@ -339,3 +339,30 @@ h1.big em { font-style: normal; color: var(--green); }
 .section-gap { margin-top: 28px; }
 .reaction-banner { margin-top: 12px; background: var(--green-soft); border: 1px solid rgba(62,221,140,.25);
   border-radius: 14px; padding: 12px 15px; font-size: 13px; color: var(--text); }
+
+/* ══ v4: 언어 토글 ══ */
+.lang-toggle { display: flex; gap: 4px; background: var(--card-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.lang-toggle button { font-size: 11.5px; font-weight: 700; color: var(--dim); padding: 5px 11px; border-radius: 999px; background: none; }
+.lang-toggle button.on { background: var(--green); color: #0b0b0d; }
+.day-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.day-chips button { width: 40px; height: 40px; border-radius: 12px; background: var(--card-2); border: 1px solid var(--line); color: var(--muted); font-size: 13px; font-weight: 700; }
+.day-chips button.on { background: var(--green-soft); border-color: rgba(62,221,140,.5); color: var(--green); }
+
+/* ══ v4.3: 목표 게이지 ══ */
+.goal-card { background: linear-gradient(135deg, rgba(62,221,140,.08), transparent 60%), var(--card); border: 1px solid rgba(62,221,140,.25); border-radius: 18px; padding: 17px; margin-top: 16px; }
+.goal-head { display: flex; justify-content: space-between; align-items: baseline; }
+.goal-head .g-title { font-size: 12px; font-weight: 800; color: var(--green); letter-spacing: .04em; }
+.goal-head .g-week { font-size: 11px; color: var(--dim); }
+.goal-big { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+.goal-big b { font-size: 30px; font-weight: 800; letter-spacing: -.02em; }
+.goal-big span { font-size: 12.5px; color: var(--muted); }
+.goal-bar { height: 10px; background: var(--card-2); border-radius: 999px; margin-top: 12px; overflow: hidden; position: relative; }
+.goal-bar i { display: block; height: 100%; background: var(--green); border-radius: 999px; }
+.goal-marks { display: flex; justify-content: space-between; font-size: 9.5px; color: var(--dim); margin-top: 5px; font-weight: 700; }
+.goal-marks .hit { color: var(--green); }
+.funnel { display: flex; gap: 6px; margin-top: 14px; }
+.funnel .fstep { flex: 1; background: var(--card-2); border: 1px solid var(--line-soft); border-radius: 11px; padding: 8px 6px; text-align: center; }
+.funnel .fstep b { display: block; font-size: 16px; font-weight: 800; }
+.funnel .fstep span { font-size: 9px; color: var(--dim); font-weight: 700; }
+.funnel .fstep.lit { border-color: rgba(62,221,140,.4); }
+.funnel .fstep.lit b { color: var(--green); }

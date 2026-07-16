@@ -85,7 +85,7 @@ export default function Talk() {
 
           <div className="composer">
             <input
-              placeholder="日本語で答えてみましょう (한국어 섞여도 OK)"
+              placeholder="🎤 키보드 마이크로 말해서 답해도 좋아요 (한국어 섞여도 OK)"
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && send()}
