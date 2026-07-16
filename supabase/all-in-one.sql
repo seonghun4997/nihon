@@ -266,3 +266,17 @@ alter table speaks enable row level security;
 
 -- 헷갈림 해결에 연속 2회 정답 요구 (집요 모드)
 alter table confusions add column if not exists win_streak int not null default 0;
+
+-- 6) v4.5 미디어 학습 칸 (영화·드라마·예능 추천 + 건진 문장)
+create table if not exists media_recs (
+  id uuid primary key default gen_random_uuid(),
+  student_id uuid not null references users(id) on delete cascade,
+  lang text not null default 'jp',
+  title text not null,
+  kind text not null default '',
+  why text not null default '',
+  how text not null default '',
+  expressions jsonb not null default '[]',
+  created_at timestamptz not null default now()
+);
+alter table media_recs enable row level security;

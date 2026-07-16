@@ -6,6 +6,7 @@ const TABS = [
   { href: '/s', ic: '🏠', label: '오늘' },
   { href: '/s/notes', ic: '📝', label: '노트' },
   { href: '/s/cards', ic: '🃏', label: '단어' },
+  { href: '/s/media', ic: '🎬', label: '미디어' },
   { href: '/s/questions', ic: '❓', label: '질문' },
   { href: '/s/plan', ic: '⚙️', label: '설정' },
 ];
