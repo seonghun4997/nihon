@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authToken } from '@/lib/auth-token';
+
+async function authToken(): Promise<string> {
+  const code = process.env.ACCESS_CODE || '';
+  const data = new TextEncoder().encode('nihon-v1::' + code);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // 공개 경로
   if (
     pathname === '/login' ||
     pathname.startsWith('/api/auth') ||
-    pathname.startsWith('/api/jp/cron') || // CRON_SECRET로 자체 보호
+    pathname.startsWith('/api/jp/cron') ||
     pathname === '/favicon.ico' ||
     pathname === '/manifest.json' ||
     pathname === '/icon.svg'
