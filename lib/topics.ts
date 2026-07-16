@@ -27,9 +27,9 @@ export async function generateTopicsFor(studentId: string, forDate: string, lang
   const s = db();
   const { data: existing } = await s.from('topics').select('*').eq('student_id', studentId).eq('lang', lang).eq('for_date', forDate).maybeSingle();
   if (existing) return existing;
-  const ctx = await buildContext(studentId, lang);
-  if (!ctx) return null;
   const { goal } = await prefOf(lang);
+  const ctx = (await buildContext(studentId, lang))
+    || `아직 수업 기록이 없습니다 (첫 수업 준비). 학습자 목표 "${goal}"와 초중급 레벨에 맞춰, 첫 회화 수업에서 다루기 좋은 주제 3개를 만들어 주세요.`;
   const out = await askClaude(TOPIC_SYSTEM(lang, goal), [{ role: 'user', content: ctx }], 3000);
   const parsed = parseJSON<TopicSet>(out);
   const { data } = await s
