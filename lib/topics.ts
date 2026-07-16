@@ -1,15 +1,17 @@
 import { db } from './supabase';
-import { askClaude, parseJSON, TOPIC_SYSTEM } from './claude';
+import { askClaude, parseJSON, TOPIC_SYSTEM, Lang } from './claude';
+import { prefOf } from './prefs';
 
 export type TopicSet = {
   topics: { jp: string; ko: string; expressions: { jp: string; reading: string; ko: string }[]; reuse: string[] }[];
 };
 
-async function buildContext(studentId: string) {
+async function buildContext(studentId: string, lang: Lang) {
   const { data: lessons } = await db()
     .from('lessons')
     .select('lesson_date, title, note, raw_text')
     .eq('student_id', studentId)
+    .eq('lang', lang)
     .order('lesson_date', { ascending: false })
     .limit(3);
   if (!lessons?.length) return null;
@@ -21,17 +23,18 @@ async function buildContext(studentId: string) {
     .join('\n\n');
 }
 
-export async function generateTopicsFor(studentId: string, forDate: string) {
+export async function generateTopicsFor(studentId: string, forDate: string, lang: Lang) {
   const s = db();
-  const { data: existing } = await s.from('topics').select('*').eq('student_id', studentId).eq('for_date', forDate).maybeSingle();
+  const { data: existing } = await s.from('topics').select('*').eq('student_id', studentId).eq('lang', lang).eq('for_date', forDate).maybeSingle();
   if (existing) return existing;
-  const ctx = await buildContext(studentId);
+  const ctx = await buildContext(studentId, lang);
   if (!ctx) return null;
-  const out = await askClaude(TOPIC_SYSTEM, [{ role: 'user', content: ctx }], 3000);
+  const { goal } = await prefOf(lang);
+  const out = await askClaude(TOPIC_SYSTEM(lang, goal), [{ role: 'user', content: ctx }], 3000);
   const parsed = parseJSON<TopicSet>(out);
   const { data } = await s
     .from('topics')
-    .upsert({ student_id: studentId, for_date: forDate, topics: parsed.topics }, { onConflict: 'student_id,for_date' })
+    .upsert({ student_id: studentId, lang, for_date: forDate, topics: parsed.topics }, { onConflict: 'student_id,lang,for_date' })
     .select()
     .single();
   return data;

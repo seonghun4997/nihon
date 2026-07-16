@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 export default function JoinForm({ code }: { code: string }) {
-  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' });
+  const [form, setForm] = useState({ name: '', phone: '', password: '' });
   const [consent, setConsent] = useState(false);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -23,9 +23,8 @@ export default function JoinForm({ code }: { code: string }) {
   return (
     <>
       <input placeholder="이름" value={form.name} onChange={set('name')} autoFocus />
-      <input type="email" placeholder="이메일" value={form.email} onChange={set('email')} />
+      <input inputMode="numeric" placeholder="휴대폰 번호 (로그인 아이디 · 알림 수신)" value={form.phone} onChange={set('phone')} />
       <input type="password" placeholder="비밀번호 (6자 이상)" value={form.password} onChange={set('password')} />
-      <input placeholder="휴대폰 (선택 — 복습·수업 알림 수신)" value={form.phone} onChange={set('phone')} />
       <label className="checkline" style={{ maxWidth: 320 }}>
         <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
         <span>수업 녹음의 <b>텍스트</b>를 학습 노트 생성에 활용하는 것에 동의합니다. (음성 파일은 저장하지 않아요)</span>
