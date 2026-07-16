@@ -1,26 +1,23 @@
-# NIHON v3 배포 — 딱 3번의 클릭 흐름
+# NIHON v4.4 — 업로드 한 번 · 진단 한 페이지
 
-예전 파일 삭제 필요 없음. 이 zip의 내용물이 구버전 경로까지 전부 덮어씁니다.
+## 딱 2단계
 
-## 1️⃣ Supabase 스키마 (2분)
-https://supabase.com/dashboard/projects → 내 프로젝트 → SQL Editor
-→ `supabase/schema-v2.sql` 내용 전체 붙여넣기 → Run
-(기존 jp_* 테이블은 안 건드림)
-
-## 2️⃣ GitHub 업로드 (2분)
+### 1️⃣ 업로드 (이 zip 하나가 전부)
 https://github.com/seonghun4997/nihon/upload/main
-→ 압축 푼 폴더 **안의 내용물 전부**를 드래그 (폴더 자체 ❌)
-→ Commit changes → Vercel 자동 배포 (2~3분)
+→ 압축 푼 폴더 **안의 내용물 전부** 드래그 → Commit changes
+→ Vercel이 2~3분 자동 배포
 
-## 3️⃣ 관리자 가입 (1분)
-https://nihon-kappa.vercel.app/signup
-→ 관리자 코드 칸에 **ACCESS_CODE 값** 입력해 가입 → 운영자 콘솔 진입
+### 2️⃣ 진단 페이지 열기
+https://nihon-kappa.vercel.app/status?key=접속코드
+→ ❌ 항목의 처방을 그대로 따라 하면 끝.
+   (테이블 미설치면 `supabase/all-in-one.sql` **하나만** SQL Editor에 Run —
+    이전에 뭘 돌렸든 안 돌렸든 이 파일 하나로 통일, 몇 번 실행해도 안전)
 
-## 그 다음 (실전 페어 세팅)
-1. 선생님에게 https://nihon-kappa.vercel.app/signup 전달 (관리자 코드 없이 가입)
-2. 운영자 콘솔에서 승인 ✓
-3. 선생님: 학생 탭 → 초대 링크 만들기 → 학생에게 카톡
-4. 학생 가입(녹음 동의 체크) → 선생님이 학생 상세에서 요금·정기 슬롯 설정 → 가동 🎉
+초기 데이터(오너 계정·요일 기본값)는 로그인하면 앱이 자동 생성 — SQL로 만들 필요 없음.
 
-환경변수 추가 없음 (기존 7개 그대로). 크론 경로는 자동 전환.
-빌드 실패 시: https://vercel.com/jari3/nihon → Deployments → 실패 로그 복사해서 전달.
+## 앱 내용 (v4.1~4.3 누적)
+- 오너 전용 · 접속 코드 로그인 · 🇯🇵일본어 ↔ 🇬🇧영어 토글
+- 목표 "여행 가서 막힘없이 일상 대화"가 모든 AI에 주입
+- 🎯 홈 목표 게이지: (입으로 통과+몸에 뱀) / 100 · 4단계 깔때기
+- 집요 복습: 🎤 말하기 테스트(자동 채점, 실패 시 D1 리셋) · 틀린 단어 즉시 재출제 · 헷갈림 연속 2회 룰
+- 위젯: widget/iphone-scriptable.js (아이폰 5분 설치)
