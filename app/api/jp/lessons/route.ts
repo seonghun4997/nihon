@@ -1,3 +1,4 @@
+import { isAuthed } from '@/lib/guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/supabase';
 import { askClaude, parseJSON, NOTE_SYSTEM } from '@/lib/claude';
@@ -16,6 +17,7 @@ type Note = {
 
 // POST: 다글로 텍스트 붙여넣기 → 수업 노트 생성 (허브의 심장)
 export async function POST(req: NextRequest) {
+  if (!isAuthed()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const { raw } = await req.json().catch(() => ({}));
   if (!raw || String(raw).trim().length < 50) {
     return NextResponse.json({ error: '전사 텍스트가 너무 짧아요. 다글로에서 전체 텍스트를 복사해 붙여넣어 주세요.' }, { status: 400 });

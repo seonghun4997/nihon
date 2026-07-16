@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+import { isAuthed } from '@/lib/guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/supabase';
 import { askClaude, TALK_SYSTEM } from '@/lib/claude';
@@ -23,6 +24,7 @@ async function lessonContext() {
 
 // GET: 오늘의 대화 세션 (없으면 AI 첫 마디로 시작)
 export async function GET() {
+  if (!isAuthed()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const s = db();
   const today = todayStr();
   const { data: existing } = await s.from('jp_talks').select('*').eq('talk_date', today).maybeSingle();
@@ -47,6 +49,7 @@ export async function GET() {
 
 // POST: 내 답장 { text } → AI 응답 + 배운 표현 재사용 감지
 export async function POST(req: NextRequest) {
+  if (!isAuthed()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const { text } = await req.json().catch(() => ({}));
   if (!text || !String(text).trim()) return NextResponse.json({ error: '내용을 입력해 주세요.' }, { status: 400 });
 

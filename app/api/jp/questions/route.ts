@@ -1,3 +1,4 @@
+import { isAuthed } from '@/lib/guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/supabase';
 import { askClaude, QA_SYSTEM } from '@/lib/claude';
@@ -7,6 +8,7 @@ export const maxDuration = 30;
 
 // POST: 질문 휙 저장 → AI 즉답
 export async function POST(req: NextRequest) {
+  if (!isAuthed()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const { question } = await req.json().catch(() => ({}));
   if (!question || String(question).trim().length < 2) {
     return NextResponse.json({ error: '질문을 입력해 주세요.' }, { status: 400 });
@@ -28,6 +30,7 @@ export async function POST(req: NextRequest) {
 
 // PATCH: [다음 수업 때 물어보기] 토글
 export async function PATCH(req: NextRequest) {
+  if (!isAuthed()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const { id, ask_teacher } = await req.json().catch(() => ({}));
   const s = db();
   const { error } = await s.from('jp_questions').update({ ask_teacher: !!ask_teacher }).eq('id', id);

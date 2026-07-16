@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+import { isAuthed } from '@/lib/guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/supabase';
 import { nextAfterCorrect, nextAfterWrong } from '@/lib/srs';
@@ -7,6 +8,7 @@ import { KANA_ROWS } from '@/lib/kana';
 
 // GET: 오늘의 10분 큐 = 만기 단어(최대 7) + ⭐헷갈림 1~2 + 가나 드릴(은퇴 안 한 행)
 export async function GET() {
+  if (!isAuthed()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const s = db();
   const today = todayStr();
 
@@ -34,6 +36,7 @@ export async function GET() {
 
 // POST: 채점 { type: 'word'|'confusion'|'kana', id/key, correct, total? }
 export async function POST(req: NextRequest) {
+  if (!isAuthed()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const body = await req.json().catch(() => ({}));
   const s = db();
   const today = todayStr();

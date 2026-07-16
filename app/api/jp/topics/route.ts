@@ -1,3 +1,4 @@
+import { isAuthed } from '@/lib/guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/supabase';
 import { generateTopicsFor } from '@/lib/topics';
@@ -7,6 +8,7 @@ export const maxDuration = 60;
 
 // GET ?for=YYYY-MM-DD : 주제 카드 조회(없으면 생성)
 export async function GET(req: NextRequest) {
+  if (!isAuthed()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const forDate = req.nextUrl.searchParams.get('for') || addDaysStr(todayStr(), 1);
   try {
     const row = await generateTopicsFor(forDate);
@@ -19,6 +21,7 @@ export async function GET(req: NextRequest) {
 
 // PATCH: 주제 선택 { for_date, selected }
 export async function PATCH(req: NextRequest) {
+  if (!isAuthed()) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const { for_date, selected } = await req.json().catch(() => ({}));
   const s = db();
   const { error } = await s.from('jp_topics').update({ selected }).eq('for_date', for_date);
