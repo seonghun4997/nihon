@@ -1,4 +1,4 @@
-import { db } from '@/lib/supabase';
+import { db, resolveSupabaseUrl } from '@/lib/supabase';
 import { getSession, OWNER_ID } from '@/lib/session';
 import { ensureSeed } from '@/lib/seed';
 
@@ -10,12 +10,13 @@ export default async function Status({ searchParams }: { searchParams: { key?: s
 
   const checks: { name: string; ok: boolean | null; fix?: string; link?: string }[] = [];
 
-  // 1. 환경변수
-  const url = process.env.SUPABASE_URL || '';
-  const urlOK = /^https:\/\//i.test(url.trim()) && url.includes('.supabase.co');
+  // 1. 환경변수 (틀려도 키에서 자동 복원)
+  const resolved = resolveSupabaseUrl();
+  const url = resolved.url || '';
+  const urlOK = !!resolved.url && resolved.source !== 'none';
   checks.push({ name: 'ACCESS_CODE 등록', ok: !!process.env.ACCESS_CODE, fix: 'Vercel 환경변수에 ACCESS_CODE 추가 후 Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   const masked = url ? url.replace(/^(https?:\/\/)?([^.\/]{0,5})[^\/]*/, (m, p1, p2) => (p1 || '') + p2 + '…') : '(비어있음)';
-  checks.push({ name: `SUPABASE_URL — 현재 값: ${masked}`, ok: !!url && urlOK, fix: 'Supabase → Settings → API의 Project URL을 복사해 교체 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
+  checks.push({ name: `SUPABASE 주소 — ${masked}${resolved.source === 'key' ? ' (환경변수가 틀려서 키에서 자동 복원함)' : ''}`, ok: urlOK, fix: 'SERVICE_ROLE_KEY를 Supabase → Settings → API의 service_role 값으로 재등록 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   checks.push({ name: 'SUPABASE_SERVICE_ROLE_KEY 등록', ok: !!process.env.SUPABASE_SERVICE_ROLE_KEY, fix: 'Supabase → Settings → API의 service_role 키(secret) 등록 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   checks.push({ name: 'ANTHROPIC_API_KEY 등록 (노트 엔진용)', ok: !!process.env.ANTHROPIC_API_KEY, fix: 'Vercel 환경변수에 추가 → Redeploy' });
 
