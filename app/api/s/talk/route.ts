@@ -39,6 +39,11 @@ export async function GET() {
   const { data } = await s.from('talks')
     .insert({ student_id: sess.id, lang, talk_date: today, lesson_id: lessonId, messages: [{ role: 'assistant', content: opener }], turns: 0 })
     .select().single();
+  // TOCTOU: 동시 요청으로 unique constraint 충돌 시 data가 null — 이미 삽입된 행 재조회
+  if (!data) {
+    const { data: existing } = await s.from('talks').select('*').eq('student_id', sess.id).eq('lang', lang).eq('talk_date', today).maybeSingle();
+    return NextResponse.json(existing);
+  }
   return NextResponse.json(data);
 }
 

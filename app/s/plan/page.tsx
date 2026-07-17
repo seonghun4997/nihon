@@ -1,5 +1,5 @@
 import { db } from '@/lib/supabase';
-import { getSession } from '@/lib/session';
+import { getSession, OWNER_ID } from '@/lib/session';
 import { getLang } from '@/lib/lang';
 import Topbar from '@/components/Topbar';
 import WeekdayPicker from '@/components/WeekdayPicker';
@@ -10,12 +10,12 @@ import { APP_VERSION } from '@/lib/version';
 export const dynamic = 'force-dynamic';
 
 export default async function Settings() {
-  getSession();
+  const sess = getSession();
   const s = db();
   const lang = getLang();
   const [{ data: prefs }, { data: me }] = await Promise.all([
     s.from('jp_prefs').select('*'),
-    s.from('users').select('phone').eq('id', '00000000-0000-0000-0000-000000000001').maybeSingle(),
+    s.from('users').select('phone').eq('id', sess?.id ?? OWNER_ID).maybeSingle(),
   ]);
   const pj = (prefs || []).find((p) => p.lang === 'jp') as any;
   const pe = (prefs || []).find((p) => p.lang === 'en') as any;
