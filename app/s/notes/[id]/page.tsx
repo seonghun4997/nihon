@@ -30,6 +30,7 @@ export default async function NoteDetail({ params }: { params: { id: string } })
               <div key={i} className={`li ${e.stuck ? 'stuck' : ''}`}>
                 {e.stuck && <span className="badge">말하려다 막힌 것</span>}
                 <span className="jp">{e.jp}</span><span className="rd">{e.reading}</span><span className="ko">{e.ko}</span>
+                {e.gram && <span className="gram">📐 {e.gram}</span>}
               </div>
             ))}
           </div>

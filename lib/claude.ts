@@ -42,8 +42,8 @@ export function parseJSON<T>(text: string): T {
 // ── 언어 파라미터화 프롬프트 (jp: 일본어 / en: 영어) ──
 export type Lang = 'jp' | 'en';
 const L = (lang: Lang) => lang === 'en'
-  ? { name: '영어', field: 'en', reading: '발음 (한글 표기, 예: 어프리시에잇)', readingWord: '발음 (한글 표기)', level: '초중급 영어' }
-  : { name: '일본어', field: 'jp', reading: '히라가나 읽기', readingWord: '히라가나', level: '초중급 일본어' };
+  ? { name: '영어', field: 'en', reading: '한국어 발음 표기 (예: 쿠다이 겟 언 아일 씻)', readingWord: '한국어 발음 표기', level: '초중급 영어' }
+  : { name: '일본어', field: 'jp', reading: '한국어 발음 표기 (예: 하지메마시테, 요로시쿠 오네가이시마스)', readingWord: '한국어 발음 표기 (히라가나 아님)', level: '초중급 일본어' };
 
 export const NOTE_SYSTEM = (lang: Lang, goal: string) => {
   const l = L(lang);
@@ -54,19 +54,21 @@ export const NOTE_SYSTEM = (lang: Lang, goal: string) => {
 {
   "title": "수업 주제 한 줄 (한국어, 15자 이내)",
   "expressions": [
-    { "jp": "${l.name} 문장", "reading": "${l.reading}", "ko": "한국어 뜻", "stuck": true/false }
+    { "jp": "${l.name} 문장", "reading": "${l.reading}", "ko": "한국어 뜻", "gram": "문법 한 줄 — 이 문장의 문형·활용을 짧게 (예: 〜てもいいですか = 허가 요청 문형)", "stuck": true/false }
   ],
   "words": [
     { "word": "단어", "reading": "${l.readingWord}", "meaning": "한국어 뜻" }
   ],
   "grammar": [
-    { "point": "문법 항목", "explain": "수업 설명 요약 + 보충 (2~3문장)", "examples": ["예문1 (뜻)", "예문2 (뜻)"] }
+    { "point": "문법 항목", "explain": "이 문법의 구조·언제 쓰는지·주의점을 3~4문장으로 친절하게", "examples": ["예문 (한국어 발음 — 뜻)", "예문2 (한국어 발음 — 뜻)"] }
   ],
   "confusions": ["학습자가 버벅이거나 한국어로 도망갔거나 선생님이 교정한 지점 — 짧게 명사구로"]
 }
 
 규칙:
-- expressions: 수업에 실제 등장한 유용한 문장 8~15개. 학습자가 말하려다 막힌 문장은 stuck: true. jp 필드에는 ${l.name} 문장을 넣습니다.
+- expressions: 수업에 실제 등장한 유용한 문장 8~15개. 학습자가 말하려다 막힌 문장은 stuck: true. jp 필드에는 ${l.name} 문장.
+- 모든 표현은 반드시 [${l.name} 원문 + 한국어 발음 + 한국어 뜻] 3요소를 갖춰야 합니다. reading은 한글로만 표기.
+- gram: 모든 표현에 문법 한 줄을 답니다. 문형 이름·활용 형태를 짚어 "왜 이렇게 말하는지"가 보이게.
 - words: 학습자에게 새로웠을 단어 5~12개. 기초 인사말 제외.
 - confusions: 실제 근거가 있는 것만 1~5개. 없으면 빈 배열.
 - 전사 오류로 보이는 ${l.name}는 자연스럽게 교정해서 수록.`;

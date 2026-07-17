@@ -385,3 +385,15 @@ h1.big em { font-style: normal; color: var(--green); }
     margin-left: calc(208px + max(0px, (100vw - 208px - 680px) / 2)); margin-right: 0; }
   .brand-m { display: none !important; }
 }
+
+/* ══ 저장(Vault) + 3단 표현 ══ */
+.vtabs { display: flex; gap: 7px; margin-top: 14px; }
+.vtab { flex: 1; text-align: center; font-size: 12.5px; font-weight: 800; padding: 10px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); color: var(--muted); }
+.vtab.on { border-color: var(--green); color: var(--green); background: var(--green-soft); }
+.vtab b { font-weight: 800; }
+.vword { display: flex; align-items: baseline; gap: 10px; padding: 10px 2px; border-bottom: 1px solid var(--line-soft); flex-wrap: wrap; }
+.vword:last-child { border-bottom: none; }
+.vword .jp { font-weight: 800; font-size: 15px; }
+.vword .rd { color: var(--green); font-size: 12px; }
+.vword .ko { color: var(--muted); font-size: 13px; flex: 1; }
+.expr .li .gram { display: block; font-size: 11.5px; color: var(--dim); margin-top: 3px; padding-left: 2px; }
