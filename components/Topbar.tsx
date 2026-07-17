@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { APP_VERSION } from '@/lib/version';
 
 // 상단바: 대분류 5개에 못 들어간 나머지 전부 (질문·설정·언어·로그아웃)
 export default function Topbar({ lang }: { name?: string; badge?: string; lang?: 'jp' | 'en' }) {
@@ -26,6 +27,7 @@ export default function Topbar({ lang }: { name?: string; badge?: string; lang?:
         <Link href="/s/questions" className="topicon" title="질문 박스">❓</Link>
         <Link href="/s/plan" className="topicon" title="설정">⚙️</Link>
         <button className="linkbtn" onClick={logout}>나가기</button>
+        <span className="ver">{APP_VERSION}</span>
       </div>
     </header>
   );

@@ -1,6 +1,7 @@
 import { db, resolveSupabaseUrl } from '@/lib/supabase';
 import { getSession, OWNER_ID } from '@/lib/session';
 import { ensureSeed } from '@/lib/seed';
+import { APP_VERSION } from '@/lib/version';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +64,7 @@ export default async function Status({ searchParams }: { searchParams: { key?: s
   return (
     <div className="wrap" style={{ paddingBottom: 60 }}>
       <header className="topbar"><div className="gem" /> <b>NIHON</b> <span className="right"><span className="role-badge">진단</span></span></header>
-      <div className="eyebrow">Setup Status</div>
+      <div className="eyebrow">Setup Status · {APP_VERSION}</div>
       <h1 className="big">{allOK ? <>준비 <em>완료</em> 🎉</> : <>남은 일이 <em>여기</em> 보입니다</>}</h1>
       <div className="sub">{authed ? '아래에서 ❌인 항목의 처방만 따라 하면 끝나요.' : '전체 진단은 로그인 후 또는 주소 뒤에 ?key=접속코드 를 붙여 확인하세요.'}</div>
 
