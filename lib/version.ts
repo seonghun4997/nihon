@@ -1,2 +1,1 @@
-// 화면 하단에 표시되는 빌드 버전 — "지금 어느 버전이 떠 있나"를 즉시 판별
-export const APP_VERSION = 'v4.8 (소급한글+토글+즉시연습)';
+export const APP_VERSION = 'v4.8.1 (의미단위 발음)';
