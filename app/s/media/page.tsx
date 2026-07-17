@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 
-type Expr = { jp: string; reading: string; ko: string; note?: string };
+type Expr = { jp: string; reading: string; ko: string; gram?: string; note?: string };
 type Rec = { id: string; title: string; kind: string; why: string; how: string; expressions: Expr[]; created_at: string };
 
 export default function Media() {
@@ -77,6 +77,7 @@ export default function Media() {
               {(latest.expressions || []).map((e, i) => (
                 <div key={i} className="li">
                   <span className="jp">{e.jp}</span><span className="rd">{e.reading}</span><span className="ko">{e.ko}</span>
+                  {e.gram && <span className="gram">📐 {e.gram}</span>}
                 </div>
               ))}
             </div>
@@ -122,6 +123,7 @@ export default function Media() {
               <div key={i} className="li">
                 <span className="jp">{e.jp}</span><span className="rd">{e.reading}</span>
                 <span className="ko">{e.ko}{e.note ? ` · ${e.note}` : ''}</span>
+                {e.gram && <span className="gram">📐 {e.gram}</span>}
               </div>
             ))}
           </div>

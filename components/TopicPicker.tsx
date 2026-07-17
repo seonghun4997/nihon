@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-type Topic = { jp: string; ko: string; expressions: { jp: string; reading: string; ko: string }[]; reuse: string[] };
+type Topic = { jp: string; ko: string; expressions: { jp: string; reading: string; ko: string; gram?: string }[]; reuse: string[] };
 
 export default function TopicPicker({ forDate }: { forDate: string }) {
   const [state, setState] = useState<'idle' | 'loading' | 'ready' | 'empty' | 'error'>('idle');
@@ -72,6 +72,7 @@ export default function TopicPicker({ forDate }: { forDate: string }) {
             {t.expressions.map((e, i) => (
               <div key={i} className="li">
                 <span className="jp">{e.jp}</span><span className="rd">{e.reading}</span><span className="ko">{e.ko}</span>
+                {e.gram && <span className="gram">📐 {e.gram}</span>}
               </div>
             ))}
           </div>
