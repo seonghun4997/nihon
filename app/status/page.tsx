@@ -14,19 +14,27 @@ export default async function Status({ searchParams }: { searchParams: { key?: s
   const url = process.env.SUPABASE_URL || '';
   const urlOK = /^https:\/\//i.test(url.trim()) && url.includes('.supabase.co');
   checks.push({ name: 'ACCESS_CODE 등록', ok: !!process.env.ACCESS_CODE, fix: 'Vercel 환경변수에 ACCESS_CODE 추가 후 Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
-  checks.push({ name: 'SUPABASE_URL 형식 (https://xxxx.supabase.co)', ok: !!url && urlOK, fix: 'Supabase → Settings → API의 Project URL을 복사해 교체 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
+  const masked = url ? url.replace(/^(https?:\/\/)?([^.\/]{0,5})[^\/]*/, (m, p1, p2) => (p1 || '') + p2 + '…') : '(비어있음)';
+  checks.push({ name: `SUPABASE_URL — 현재 값: ${masked}`, ok: !!url && urlOK, fix: 'Supabase → Settings → API의 Project URL을 복사해 교체 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   checks.push({ name: 'SUPABASE_SERVICE_ROLE_KEY 등록', ok: !!process.env.SUPABASE_SERVICE_ROLE_KEY, fix: 'Supabase → Settings → API의 service_role 키(secret) 등록 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   checks.push({ name: 'ANTHROPIC_API_KEY 등록 (노트 엔진용)', ok: !!process.env.ANTHROPIC_API_KEY, fix: 'Vercel 환경변수에 추가 → Redeploy' });
 
   // 2. DB 연결 + 테이블 + 시드 (인증된 경우만 실제 조회)
   let dbReach: boolean | null = null, tables: boolean | null = null, seeded: boolean | null = null;
   let seedReason = '';
+  let dbError = '';
   if (authed && url && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       const { error } = await db().from('users').select('id', { count: 'exact', head: true });
       if (error) {
-        dbReach = true;
-        tables = !/relation|does not exist|schema cache/i.test(error.message);
+        // 테이블 없음 계열만 "연결은 됨"으로 인정 — 그 외 모든 에러는 연결 ❌ + 원문 표시
+        if (/relation|does not exist|schema cache/i.test(error.message)) {
+          dbReach = true;
+          tables = false;
+        } else {
+          dbReach = false;
+          dbError = error.message;
+        }
       } else {
         dbReach = true;
         const [{ error: e1 }, { error: e2 }] = await Promise.all([
@@ -45,7 +53,7 @@ export default async function Status({ searchParams }: { searchParams: { key?: s
       dbReach = false;
     }
   }
-  checks.push({ name: 'Supabase 연결', ok: dbReach, fix: 'SUPABASE_URL 값이 틀렸을 가능성이 커요 — 위 2번 항목 확인' });
+  checks.push({ name: 'Supabase 연결 (실제 통신)', ok: dbReach, fix: (dbError ? `서버가 말한 원인: "${dbError}" — ` : '') + 'SUPABASE_URL을 Supabase → Settings → API → Project URL 값으로 교체 후 Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   checks.push({ name: '테이블 설치 (all-in-one.sql)', ok: tables, fix: 'Supabase SQL Editor에 supabase/all-in-one.sql 전체 붙여넣고 Run — 이게 마지막 남은 한 번입니다', link: 'https://supabase.com/dashboard/projects' });
   checks.push({ name: '초기 데이터 (이 페이지가 자동 생성)', ok: seeded, fix: seedReason ? `실패 원인: ${seedReason} — 이 문구를 그대로 전달해 주세요` : '이 페이지 새로고침만으로 만들어져요' });
 

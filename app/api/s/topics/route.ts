@@ -12,8 +12,10 @@ export const maxDuration = 60;
 export async function GET(req: NextRequest) {
   const sess = getSession();
   if (!sess || sess.role !== 'student') return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-  const forDate = req.nextUrl.searchParams.get('for') || addDaysStr(todayStr(), 1);
+  const forDate = req.nextUrl.searchParams.get('for') || todayStr();
+  const reroll = req.nextUrl.searchParams.get('reroll') === '1';
   try {
+    if (reroll) await db().from('topics').delete().eq('student_id', sess.id).eq('lang', getLang()).eq('for_date', forDate);
     const row = await generateTopicsFor(sess.id, forDate, getLang());
     if (!row) return NextResponse.json({ empty: true, reason: '주제 생성에 실패했어요 — 다시 시도해 주세요.' });
     return NextResponse.json(row);

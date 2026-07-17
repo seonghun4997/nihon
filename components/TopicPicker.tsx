@@ -10,9 +10,9 @@ export default function TopicPicker({ forDate }: { forDate: string }) {
   const [msg, setMsg] = useState('');
   const [copied, setCopied] = useState(false);
 
-  async function load() {
+  async function load(reroll = false) {
     setState('loading');
-    const res = await fetch(`/api/s/topics?for=${forDate}`);
+    const res = await fetch(`/api/s/topics?for=${forDate}${reroll ? '&reroll=1' : ''}`);
     const data = await res.json();
     if (data.empty) { setState('empty'); setMsg(data.reason); return; }
     if (!res.ok) { setState('error'); setMsg(data.error || '실패'); return; }
@@ -36,9 +36,9 @@ export default function TopicPicker({ forDate }: { forDate: string }) {
     try { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
   }
 
-  if (state === 'idle') return <div className="row"><button className="btn block" onClick={load}>내일 주제 카드 3개 받기 →</button></div>;
-  if (state === 'loading') return <div className="row"><button className="btn block" disabled><span className="spin" /> 최근 수업에서 주제를 뽑는 중…</button></div>;
-  if (state === 'empty' || state === 'error') return <div className="empty">{msg}</div>;
+  if (state === 'idle') return <div className="row"><button className="btn block" onClick={() => load()}>주제 3개 뽑기 →</button></div>;
+  if (state === 'loading') return <div className="row"><button className="btn block" disabled><span className="spin" /> 주제를 뽑는 중…</button></div>;
+  if (state === 'empty' || state === 'error') return <><div className="empty">{msg}</div><div className="row"><button className="btn ghost sm" onClick={() => load(true)}>다시 시도 →</button></div></>;
 
   return (
     <>
@@ -52,12 +52,10 @@ export default function TopicPicker({ forDate }: { forDate: string }) {
           </button>
         ))}
       </div>
-      {selected !== null && (
-        <div className="row">
-          <button className="btn ghost sm" onClick={share}>{copied ? '복사됐어요 ✓' : '선생님께 공유 (카톡 복사)'}</button>
-          <span className="hintline">선생님 브리핑에도 자동으로 들어가요</span>
-        </div>
-      )}
+      <div className="row">
+        <button className="btn ghost sm" onClick={() => load(true)}>🎲 다시 뽑기</button>
+        {selected !== null && <button className="btn ghost sm" onClick={share}>{copied ? '복사됐어요 ✓' : '카톡으로 공유'}</button>}
+      </div>
     </>
   );
 }
