@@ -1,6 +1,7 @@
 import { db } from './supabase';
 import { askClaude, parseJSON, TOPIC_SYSTEM, Lang } from './claude';
 import { prefOf } from './prefs';
+import { forceKoreanReading } from './kana2ko';
 
 export type TopicSet = {
   topics: { jp: string; ko: string; expressions: { jp: string; reading: string; ko: string }[]; reuse: string[] }[];
@@ -32,6 +33,10 @@ export async function generateTopicsFor(studentId: string, forDate: string, lang
     || `아직 수업 기록이 없습니다 (첫 수업 준비). 학습자 목표 "${goal}"와 초중급 레벨에 맞춰, 첫 회화 수업에서 다루기 좋은 주제 3개를 만들어 주세요.`;
   const out = await askClaude(TOPIC_SYSTEM(lang, goal), [{ role: 'user', content: ctx }], 3000);
   const parsed = parseJSON<TopicSet>(out);
+  parsed.topics = (parsed.topics || []).map((t) => ({
+    ...t,
+    expressions: (t.expressions || []).map((e) => forceKoreanReading(e, lang)),
+  }));
   const { data } = await s
     .from('topics')
     .upsert({ student_id: studentId, lang, for_date: forDate, topics: parsed.topics }, { onConflict: 'student_id,lang,for_date' })

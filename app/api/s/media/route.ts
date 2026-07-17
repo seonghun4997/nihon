@@ -6,6 +6,7 @@ import { getLang } from '@/lib/lang';
 import { prefOf } from '@/lib/prefs';
 import { initialDue } from '@/lib/srs';
 import { markActivity } from '@/lib/data';
+import { forceKoreanReading } from '@/lib/kana2ko';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
     try {
       const out = await askClaude(MEDIA_REC_SYSTEM(lang, goal, exclude), [{ role: 'user', content: '오늘의 추천 1개' }], 1500);
       const rec = parseJSON<any>(out);
+      rec.expressions = (rec.expressions || []).map((e: any) => forceKoreanReading(e, lang));
       const { data, error } = await s.from('media_recs').insert({
         student_id: sess.id, lang, title: rec.title || '', kind: rec.kind || '',
         why: rec.why || '', how: rec.how || '', expressions: rec.expressions || [],
@@ -66,7 +68,7 @@ export async function POST(req: NextRequest) {
     try {
       const out = await askClaude(MEDIA_CATCH_SYSTEM(lang), [{ role: 'user', content: text }], 2000);
       const parsed = parseJSON<{ items: any[] }>(out);
-      const items = (parsed.items || []).slice(0, 10);
+      const items = (parsed.items || []).slice(0, 10).map((e: any) => forceKoreanReading(e, lang));
       const rows = items.map((e) => ({
         student_id: sess.id, lang, text: String(e.jp || '').slice(0, 300),
         reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: initialDue(),
