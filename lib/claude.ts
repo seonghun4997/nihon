@@ -43,7 +43,7 @@ export function parseJSON<T>(text: string): T {
 export type Lang = 'jp' | 'en';
 const L = (lang: Lang) => lang === 'en'
   ? { name: '영어', field: 'en', reading: '한국어 발음 표기 (예: 쿠다이 겟 언 아일 씻)', readingWord: '한국어 발음 표기', level: '초중급 영어' }
-  : { name: '일본어', field: 'jp', reading: '한국어 발음 표기 (예: 하지메마시테, 요로시쿠 오네가이시마스)', readingWord: '한국어 발음 표기 (히라가나 아님)', level: '초중급 일본어' };
+  : { name: '일본어', field: 'jp', reading: '히라가나 읽기 (전문 후리가나)', readingWord: '히라가나', level: '초중급 일본어' };
 
 export const NOTE_SYSTEM = (lang: Lang, goal: string) => {
   const l = L(lang);
@@ -67,7 +67,7 @@ export const NOTE_SYSTEM = (lang: Lang, goal: string) => {
 
 규칙:
 - expressions: 수업에 실제 등장한 유용한 문장 8~15개. 학습자가 말하려다 막힌 문장은 stuck: true. jp 필드에는 ${l.name} 문장.
-- 모든 표현은 반드시 [${l.name} 원문 + 한국어 발음 + 한국어 뜻] 3요소를 갖춰야 합니다. reading은 한글로만 표기.
+- 모든 표현은 반드시 [${l.name} 원문 + 발음 + 한국어 뜻] 3요소를 갖춥니다.
 - gram: 모든 표현에 문법 한 줄을 답니다. 문형 이름·활용 형태를 짚어 "왜 이렇게 말하는지"가 보이게.
 - words: 학습자에게 새로웠을 단어 5~12개. 기초 인사말 제외.
 - confusions: 실제 근거가 있는 것만 1~5개. 없으면 빈 배열.
@@ -92,7 +92,6 @@ export const TOPIC_SYSTEM = (lang: Lang, goal: string) => {
 }
 
 규칙: topics는 정확히 3개. expressions는 주제당 5개, reuse는 2개.
-- 모든 reading은 반드시 한글 발음 표기만 사용 (히라가나·가타카나·로마자 금지. 예: 하지메마시테).
 - 모든 표현에 gram(문법 한 줄)을 답니다. 최근 수업과 자연스럽게 이어지되 겹치지 않게. 학습자의 실제 삶(일·일상·관심사)이 전사에 드러나면 반영.`;
 };
 
@@ -128,7 +127,7 @@ export const MEDIA_REC_SYSTEM = (lang: Lang, goal: string, exclude: string[]) =>
   "how": "학습법 한 문장 (예: 한글자막 1회 → 원어자막으로 같은 회차 재시청, 10분 단위)",
   "expressions": [ { "jp": "이 작품 장르·상황에서 자주 나오는 실전 ${name} 일상 표현", "reading": "한국어 발음 표기 (한글로만. 히라가나·로마자 금지)", "ko": "뜻", "gram": "문법 한 줄" } ]
 }
-규칙: expressions는 5개. reading은 반드시 한글 발음 표기. 모든 표현에 gram을 답니다. 실제 대사를 인용하지 말고, 그 작품의 장면 유형(식당·이동·잡담 등)에서 통용되는 범용 표현으로. 초중급이 바로 써먹을 수 있는 것만.`;
+규칙: expressions는 5개. 모든 표현에 gram을 답니다. 실제 대사를 인용하지 말고, 그 작품의 장면 유형(식당·이동·잡담 등)에서 통용되는 범용 표현으로. 초중급이 바로 써먹을 수 있는 것만.`;
 };
 
 export const MEDIA_CATCH_SYSTEM = (lang: Lang) => {
@@ -137,5 +136,5 @@ export const MEDIA_CATCH_SYSTEM = (lang: Lang) => {
 {
   "items": [ { "jp": "${name} 문장 (오타·청취 오류는 자연스럽게 교정)", "reading": "한국어 발음 표기 (한글로만. 히라가나·로마자 금지)", "ko": "한국어 뜻", "gram": "문법 한 줄 (문형·활용)", "note": "뉘앙스 한 줄" } ]
 }
-규칙: 입력에 실제로 있는 것만, 최대 10개. reading은 반드시 한글 발음 표기. 모든 항목에 gram을 답니다. 문장이 아니라 단어면 짧은 예문으로 확장.`;
+규칙: 입력에 실제로 있는 것만, 최대 10개. 모든 항목에 gram을 답니다. 문장이 아니라 단어면 짧은 예문으로 확장.`;
 };

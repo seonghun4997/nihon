@@ -65,14 +65,14 @@ export async function POST(req: NextRequest) {
     lang,
     lesson_id: lesson.id,
     word: w.word, reading: w.reading || '', meaning: w.meaning || '',
-    stage: 0, next_due: initialDue(),
+    stage: 0, next_due: todayStr(), // 수업 직후 바로 입으로
   }));
   if (words.length) await s.from('words').upsert(words, { onConflict: 'student_id,word,meaning', ignoreDuplicates: true });
 
   // 집요 복습: 말하려다 막힌 표현 → 말하기 테스트 큐(SRS)에 적립
   const speaks = (note.expressions || []).filter((e) => e.stuck).map((e) => ({
     student_id: sess.id, lang, text: e.jp, reading: e.reading || '', ko: e.ko || '',
-    stage: 0, next_due: initialDue(),
+    stage: 0, next_due: todayStr(), // 수업 직후 바로 입으로
   }));
   if (speaks.length) await s.from('speaks').upsert(speaks, { onConflict: 'student_id,lang,text', ignoreDuplicates: true });
 

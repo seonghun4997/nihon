@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { db } from '@/lib/supabase';
 import { getSession } from '@/lib/session';
 import { formatKo } from '@/lib/dates';
+import Reading from '@/components/Reading';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,7 +30,7 @@ export default async function NoteDetail({ params }: { params: { id: string } })
             {exprs.map((e, i) => (
               <div key={i} className={`li ${e.stuck ? 'stuck' : ''}`}>
                 {e.stuck && <span className="badge">말하려다 막힌 것</span>}
-                <span className="jp">{e.jp}</span><span className="rd">{e.reading}</span><span className="ko">{e.ko}</span>
+                <span className="jp">{e.jp}</span><Reading ko={e.reading} kana={e.kana} /><span className="ko">{e.ko}</span>
                 {e.gram && <span className="gram">📐 {e.gram}</span>}
               </div>
             ))}

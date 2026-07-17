@@ -66,8 +66,10 @@ export function kanaToHangul(input: string): string {
   return out;
 }
 
-/** 표현/단어 객체의 reading을 한글로 강제 (jp 전용 — en은 통과) */
-export function forceKoreanReading<T extends { reading?: string }>(item: T, lang: string): T {
+/** jp: reading(한글 발음)을 기본으로, kana(히라가나 원본)를 토글용으로 함께 보존. en은 통과 */
+export function forceKoreanReading<T extends { reading?: string; kana?: string }>(item: T, lang: string): T {
   if (lang !== 'jp' || !item?.reading) return item;
-  return { ...item, reading: kanaToHangul(String(item.reading)) };
+  const raw = String(item.reading);
+  if (!/[\u3040-\u30ff]/.test(raw)) return item; // 이미 한글이면 그대로
+  return { ...item, kana: raw, reading: kanaToHangul(raw) };
 }

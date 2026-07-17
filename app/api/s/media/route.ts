@@ -5,6 +5,7 @@ import { askClaude, parseJSON, MEDIA_REC_SYSTEM, MEDIA_CATCH_SYSTEM } from '@/li
 import { getLang } from '@/lib/lang';
 import { prefOf } from '@/lib/prefs';
 import { initialDue } from '@/lib/srs';
+import { todayStr } from '@/lib/dates';
 import { markActivity } from '@/lib/data';
 import { forceKoreanReading } from '@/lib/kana2ko';
 
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
     if (!exprs.length) return NextResponse.json({ error: '담을 표현이 없어요.' }, { status: 400 });
     const rows = exprs.map((e) => ({
       student_id: sess.id, lang, text: String(e.jp || '').slice(0, 300),
-      reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: initialDue(),
+      reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: todayStr(), // 담자마자 바로 연습 가능
     })).filter((r) => r.text);
     await s.from('speaks').upsert(rows, { onConflict: 'student_id,lang,text', ignoreDuplicates: true });
     await markActivity(sess.id);
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
       const items = (parsed.items || []).slice(0, 10).map((e: any) => forceKoreanReading(e, lang));
       const rows = items.map((e) => ({
         student_id: sess.id, lang, text: String(e.jp || '').slice(0, 300),
-        reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: initialDue(),
+        reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: todayStr(), // 담자마자 바로 연습 가능
       })).filter((r) => r.text);
       if (rows.length) await s.from('speaks').upsert(rows, { onConflict: 'student_id,lang,text', ignoreDuplicates: true });
       await markActivity(sess.id);

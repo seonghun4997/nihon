@@ -54,7 +54,7 @@ export async function PATCH(req: NextRequest) {
     }
     const speaks = (t.expressions || []).slice(0, 5).map((e: any) => ({
       student_id: sess.id, lang, text: String(e.jp || '').slice(0, 300),
-      reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: initialDue(),
+      reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: todayStr(), // 고르자마자 바로 연습 가능
     })).filter((r: any) => r.text);
     speakCount = speaks.length;
     if (speaks.length) await s.from('speaks').upsert(speaks, { onConflict: 'student_id,lang,text', ignoreDuplicates: true });

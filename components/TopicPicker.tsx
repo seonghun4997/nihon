@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Reading from '@/components/Reading';
 
-type Topic = { jp: string; ko: string; expressions: { jp: string; reading: string; ko: string; gram?: string }[]; reuse: string[] };
+type Topic = { jp: string; ko: string; expressions: { jp: string; reading: string; kana?: string; ko: string; gram?: string }[]; reuse: string[] };
 
 export default function TopicPicker({ forDate }: { forDate: string }) {
   const [state, setState] = useState<'idle' | 'loading' | 'ready' | 'empty' | 'error'>('idle');
@@ -71,7 +72,7 @@ export default function TopicPicker({ forDate }: { forDate: string }) {
           <div className="expr" style={{ marginTop: 10 }}>
             {t.expressions.map((e, i) => (
               <div key={i} className="li">
-                <span className="jp">{e.jp}</span><span className="rd">{e.reading}</span><span className="ko">{e.ko}</span>
+                <span className="jp">{e.jp}</span><Reading ko={e.reading} kana={e.kana} /><span className="ko">{e.ko}</span>
                 {e.gram && <span className="gram">📐 {e.gram}</span>}
               </div>
             ))}

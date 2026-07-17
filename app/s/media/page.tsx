@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Reading from '@/components/Reading';
 
-type Expr = { jp: string; reading: string; ko: string; gram?: string; note?: string };
+type Expr = { jp: string; reading: string; kana?: string; ko: string; gram?: string; note?: string };
 type Rec = { id: string; title: string; kind: string; why: string; how: string; expressions: Expr[]; created_at: string };
 
 export default function Media() {
@@ -76,17 +77,21 @@ export default function Media() {
             <div className="expr" style={{ marginTop: 10 }}>
               {(latest.expressions || []).map((e, i) => (
                 <div key={i} className="li">
-                  <span className="jp">{e.jp}</span><span className="rd">{e.reading}</span><span className="ko">{e.ko}</span>
+                  <span className="jp">{e.jp}</span><Reading ko={e.reading} kana={e.kana} /><span className="ko">{e.ko}</span>
                   {e.gram && <span className="gram">📐 {e.gram}</span>}
                 </div>
               ))}
             </div>
             <div className="row">
-              <button className="btn sm" onClick={() => saveExprs(latest)}>
+              <a className="btn sm" target="_blank" rel="noreferrer"
+                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(latest.title)}`}>
+                ▶️ 유튜브에서 보기
+              </a>
+              <button className="btn ghost sm" onClick={() => saveExprs(latest)}>
                 {savedId === latest.id ? '말하기 큐에 담김 ✓' : '표현 5개 → 복습 큐에 담기'}
               </button>
               <button className="btn ghost sm" onClick={recommend} disabled={busy}>
-                {busy ? '고르는 중…' : '다른 작품 추천'}
+                {busy ? '고르는 중…' : '다른 작품'}
               </button>
             </div>
           </>
@@ -121,7 +126,7 @@ export default function Media() {
             <p className="hintline" style={{ marginBottom: 6 }}>✓ {caughtN}개가 말하기 큐에 들어갔어요 — 내일 아침부터 입으로 테스트</p>
             {caught.map((e, i) => (
               <div key={i} className="li">
-                <span className="jp">{e.jp}</span><span className="rd">{e.reading}</span>
+                <span className="jp">{e.jp}</span><Reading ko={e.reading} kana={e.kana} />
                 <span className="ko">{e.ko}{e.note ? ` · ${e.note}` : ''}</span>
                 {e.gram && <span className="gram">📐 {e.gram}</span>}
               </div>
