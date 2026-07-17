@@ -66,10 +66,25 @@ export function kanaToHangul(input: string): string {
   return out;
 }
 
+/** 의미 단위 분절 (조사 경계 휴리스틱) — AI가 안 띄우면 코드가 안전한 만큼만 띄운다.
+ *  안전 조사만 사용: を·の·から·まで (단어 내부 출현이 사실상 없음) + 앞뒤 2글자 가드.
+ *  원칙: 틀린 분리보다 안 하는 게 낫다 — 나머지 분절은 AI 프롬프트가 담당 */
+export function segmentKana(s: string): string {
+  if (/\s/.test(s)) return s; // AI가 이미 띄어 썼으면 존중
+  let r = s;
+  r = r.replace(/([^\s。、！？]{2})(から|まで)(?=[^\s。、！？]{2,})/g, '$1$2 ');
+  r = r.replace(/([^\s。、！？]{2})(を|の)(?=[^\s。、！？]{2,})/g, '$1$2 ');
+  return r;
+}
+
 /** jp: reading(한글 발음)을 기본으로, kana(히라가나 원본)를 토글용으로 함께 보존. en은 통과 */
 export function forceKoreanReading<T extends { reading?: string; kana?: string }>(item: T, lang: string): T {
-  if (lang !== 'jp' || !item?.reading) return item;
-  const raw = String(item.reading);
-  if (!/[\u3040-\u30ff]/.test(raw)) return item; // 이미 한글이면 그대로
-  return { ...item, kana: raw, reading: kanaToHangul(raw) };
+  if (lang !== 'jp') return item;
+  // 이미 kana가 저장돼 있으면 → 분절 후 재변환 (옛 데이터도 소급 띄어쓰기)
+  const src = item?.kana && /[\u3040-\u30ff]/.test(String(item.kana))
+    ? String(item.kana)
+    : (item?.reading && /[\u3040-\u30ff]/.test(String(item.reading)) ? String(item.reading) : null);
+  if (!src) return item;
+  const spaced = segmentKana(src);
+  return { ...item, kana: spaced, reading: kanaToHangul(spaced) };
 }
