@@ -366,3 +366,19 @@ h1.big em { font-style: normal; color: var(--green); }
 .funnel .fstep span { font-size: 9px; color: var(--dim); font-weight: 700; }
 .funnel .fstep.lit { border-color: rgba(62,221,140,.4); }
 .funnel .fstep.lit b { color: var(--green); }
+
+/* ══ IA 표준: 대분류 5 (모바일 하단탭 ↔ 데스크톱 왼쪽바) + 상단바 나머지 ══ */
+.topicon { font-size: 15px; text-decoration: none; background: var(--card-2); border: 1px solid var(--line); border-radius: 10px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; }
+.topicon:active { background: var(--card); }
+.side-brand { display: none; }
+.lang-toggle button { padding: 5px 9px; }
+
+@media (min-width: 900px) {
+  .tabbar { position: fixed; left: 0; top: 0; bottom: 0; width: 208px; flex-direction: column; justify-content: flex-start; gap: 4px; padding: 22px 14px; border-top: none; border-right: 1px solid var(--line); background: var(--card); }
+  .tabbar a { flex-direction: row; justify-content: flex-start; gap: 11px; font-size: 13.5px; font-weight: 700; padding: 11px 13px; border-radius: 11px; width: 100%; }
+  .tabbar a.on { background: var(--card-2); }
+  .tabbar a .ic { font-size: 17px; }
+  .side-brand { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: .1em; padding: 4px 13px 20px; }
+  .wrap { margin-left: 208px; max-width: 720px; padding-left: 40px; padding-right: 40px; }
+  .brand-m { display: none !important; }
+}
