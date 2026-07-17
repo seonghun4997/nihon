@@ -6,7 +6,7 @@ import { todayStr } from '@/lib/dates';
 import { KANA_ROWS } from '@/lib/kana';
 import { markActivity } from '@/lib/data';
 import { getLang } from '@/lib/lang';
-import { forceKoreanReading } from '@/lib/kana2ko';
+import { koreanizeAll } from '@/lib/reading';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,8 +26,8 @@ export async function GET() {
   const kana = lang !== 'jp' ? [] : KANA_ROWS.filter((r) => !statMap.get(r.key)?.retired).slice(0, 2).map((r) => ({ key: r.key, label: r.label, chars: r.chars }));
   return NextResponse.json({
     lang,
-    speaks: (speaks || []).map((sp) => forceKoreanReading(sp, lang)),
-    words: (words || []).map((w) => forceKoreanReading(w, lang)),
+    speaks: await koreanizeAll((speaks || []).map((sp) => ({ ...sp, jp: sp.text })), lang),
+    words: await koreanizeAll(words || [], lang),
     confusions: confusions || [],
     kana,
   });

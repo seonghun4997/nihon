@@ -7,7 +7,7 @@ import { todayStr } from '@/lib/dates';
 import { markActivity } from '@/lib/data';
 import { getLang } from '@/lib/lang';
 import { prefOf } from '@/lib/prefs';
-import { forceKoreanReading } from '@/lib/kana2ko';
+import { koreanizeAll } from '@/lib/reading';
 
 export const maxDuration = 60;
 
@@ -34,8 +34,8 @@ export async function POST(req: NextRequest) {
   try {
     const out = await askClaude(NOTE_SYSTEM(lang, goal), [{ role: 'user', content: String(raw).slice(0, 60000) }], 4000);
     note = parseJSON<Note>(out);
-    note.expressions = (note.expressions || []).map((e) => forceKoreanReading(e, lang));
-    note.words = (note.words || []).map((w) => forceKoreanReading(w, lang));
+    note.expressions = await koreanizeAll(note.expressions || [], lang);
+    note.words = await koreanizeAll(note.words || [], lang);
   } catch (e: any) {
     return NextResponse.json({ error: 'AI 분해 실패 — 잠시 후 다시 시도해 주세요. (' + e.message + ')' }, { status: 502 });
   }

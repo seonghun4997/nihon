@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverComponentsExternalPackages: ['kuromoji'],
+    outputFileTracingIncludes: { '/**': ['./node_modules/kuromoji/**'] },
+  },
   headers: async () => [
     {
       source: '/:path*',

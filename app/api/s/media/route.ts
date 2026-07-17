@@ -7,7 +7,7 @@ import { prefOf } from '@/lib/prefs';
 import { initialDue } from '@/lib/srs';
 import { todayStr } from '@/lib/dates';
 import { markActivity } from '@/lib/data';
-import { forceKoreanReading } from '@/lib/kana2ko';
+import { koreanizeAll } from '@/lib/reading';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -19,10 +19,10 @@ export async function GET() {
   const { data } = await db().from('media_recs').select('*')
     .eq('student_id', sess.id).eq('lang', lang0)
     .order('created_at', { ascending: false }).limit(10);
-  const items = (data || []).map((r) => ({
+  const items = await Promise.all((data || []).map(async (r) => ({
     ...r,
-    expressions: (r.expressions || []).map((e: any) => forceKoreanReading(e, lang0)),
-  }));
+    expressions: await koreanizeAll(r.expressions || [], lang0),
+  })));
   return NextResponse.json({ items });
 }
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     try {
       const out = await askClaude(MEDIA_REC_SYSTEM(lang, goal, exclude), [{ role: 'user', content: '오늘의 추천 1개' }], 1500);
       const rec = parseJSON<any>(out);
-      rec.expressions = (rec.expressions || []).map((e: any) => forceKoreanReading(e, lang));
+      rec.expressions = await koreanizeAll(rec.expressions || [], lang);
       const { data, error } = await s.from('media_recs').insert({
         student_id: sess.id, lang, title: rec.title || '', kind: rec.kind || '',
         why: rec.why || '', how: rec.how || '', expressions: rec.expressions || [],
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     try {
       const out = await askClaude(MEDIA_CATCH_SYSTEM(lang), [{ role: 'user', content: text }], 2000);
       const parsed = parseJSON<{ items: any[] }>(out);
-      const items = (parsed.items || []).slice(0, 10).map((e: any) => forceKoreanReading(e, lang));
+      const items = await koreanizeAll((parsed.items || []).slice(0, 10), lang);
       const rows = items.map((e) => ({
         student_id: sess.id, lang, text: String(e.jp || '').slice(0, 300),
         reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: todayStr(), // 담자마자 바로 연습 가능

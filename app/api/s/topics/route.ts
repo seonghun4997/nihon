@@ -5,7 +5,7 @@ import { generateTopicsFor } from '@/lib/topics';
 import { addDaysStr, todayStr } from '@/lib/dates';
 import { getLang } from '@/lib/lang';
 import { initialDue } from '@/lib/srs';
-import { forceKoreanReading } from '@/lib/kana2ko';
+import { koreanizeAll } from '@/lib/reading';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -21,13 +21,11 @@ export async function GET(req: NextRequest) {
     if (!row) return NextResponse.json({ empty: true, reason: '주제 생성에 실패했어요 — 다시 시도해 주세요.' });
     // 소급 변환: 예전에 저장된 히라가나 데이터도 화면엔 항상 한글로
     const lang0 = getLang();
-    return NextResponse.json({
-      ...row,
-      topics: (row.topics || []).map((t: any) => ({
-        ...t,
-        expressions: (t.expressions || []).map((e: any) => forceKoreanReading(e, lang0)),
-      })),
-    });
+    const topics = await Promise.all((row.topics || []).map(async (t: any) => ({
+      ...t,
+      expressions: await koreanizeAll(t.expressions || [], lang0),
+    })));
+    return NextResponse.json({ ...row, topics });
   } catch (e: any) {
     return NextResponse.json({ error: '주제 생성 실패: ' + e.message }, { status: 502 });
   }
