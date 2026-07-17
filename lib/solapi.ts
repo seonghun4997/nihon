@@ -6,7 +6,6 @@ export async function sendSMS(to: string | null | undefined, text: string): Prom
   const apiSecret = process.env.SOLAPI_API_SECRET;
   const from = process.env.SOLAPI_FROM;
   if (!apiKey || !apiSecret || !from || !to) {
-    console.log('[solapi] 건너뜀:', to, text.slice(0, 50));
     return { sent: false, reason: 'no-keys-or-recipient' };
   }
   const date = new Date().toISOString();

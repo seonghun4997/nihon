@@ -20,6 +20,10 @@ export default async function Status({ searchParams }: { searchParams: { key?: s
   checks.push({ name: `SUPABASE 주소 — ${masked}${resolved.source === 'key' ? ' (키에서 복원)' : resolved.source === 'fallback' ? ' (내장 주소 사용)' : ''}`, ok: urlOK, fix: 'SERVICE_ROLE_KEY를 Supabase → Settings → API의 service_role 값으로 재등록 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   checks.push({ name: 'SUPABASE_SERVICE_ROLE_KEY 등록', ok: !!process.env.SUPABASE_SERVICE_ROLE_KEY, fix: 'Supabase → Settings → API의 service_role 키(secret) 등록 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
   checks.push({ name: 'ANTHROPIC_API_KEY 등록 (노트 엔진용)', ok: !!process.env.ANTHROPIC_API_KEY, fix: 'Vercel 환경변수에 추가 → Redeploy' });
+  checks.push({ name: 'CRON_SECRET 등록 (크론 보호)', ok: !!process.env.CRON_SECRET, fix: 'Vercel 환경변수에 CRON_SECRET 추가 → vercel.json crons의 Bearer 값과 동일하게 → Redeploy', link: 'https://vercel.com/jari3/nihon/settings/environment-variables' });
+  checks.push({ name: 'SOLAPI_API_KEY 등록 (문자 발송)', ok: !!process.env.SOLAPI_API_KEY, fix: 'Solapi 콘솔 → API 키 발급 후 SOLAPI_API_KEY 등록 → Redeploy' });
+  checks.push({ name: 'SOLAPI_API_SECRET 등록 (문자 발송)', ok: !!process.env.SOLAPI_API_SECRET, fix: 'Solapi 콘솔 → API Secret을 SOLAPI_API_SECRET에 등록 → Redeploy' });
+  checks.push({ name: 'SOLAPI_FROM 등록 (발신 번호)', ok: !!process.env.SOLAPI_FROM, fix: 'Solapi에서 발신번호 등록 후 숫자만(01012345678) SOLAPI_FROM에 입력 → Redeploy' });
 
   // 2. DB 연결 + 테이블 + 시드 (인증된 경우만 실제 조회)
   let dbReach: boolean | null = null, tables: boolean | null = null, seeded: boolean | null = null;
