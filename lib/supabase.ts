@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-// SERVICE_ROLE_KEY(JWT) 안에는 프로젝트 ref가 들어있다 → 올바른 주소를 스스로 복원
+// 오너 프로젝트 고정 주소 — 환경변수가 어떤 값이든 앱은 반드시 여기로 연결된다
+const FALLBACK_URL = 'https://rwwcqhxxnabayycfomoa.supabase.co';
+
+// (구형 JWT 키인 경우) 키 안의 ref로 주소 복원
 export function deriveUrlFromKey(key: string | undefined): string | null {
   try {
     if (!key || key.split('.').length !== 3) return null;
@@ -9,26 +12,25 @@ export function deriveUrlFromKey(key: string | undefined): string | null {
   } catch { return null; }
 }
 
-export function resolveSupabaseUrl(): { url: string | null; source: 'env' | 'key' | 'none'; envRaw: string } {
+export function resolveSupabaseUrl(): { url: string; source: 'env' | 'key' | 'fallback'; envRaw: string } {
   const envRaw = (process.env.SUPABASE_URL || '').trim();
-  const validEnv = /^https?:\/\/[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?\/?$/.test(envRaw) &&
-    (envRaw.includes('.supabase.co') || envRaw.includes('localhost')) &&
-    !envRaw.includes('supabase.com') && !/supabase\.co\/./.test(envRaw.replace(/\/$/, '') + '/x'.slice(0, 0));
-  const cleanEnv = envRaw.replace(/\/+$/, '');
-  // env 값이 순수한 프로젝트 주소면 그대로, 아니면 키에서 복원
-  const envOK = validEnv && /^https?:\/\/[a-z0-9-]+\.(supabase\.co|localhost)$|localhost/.test(cleanEnv);
-  if (envOK) return { url: cleanEnv, source: 'env', envRaw };
+  // env 값에서 순수 주소만 추출 (/rest/v1 등 경로가 붙어 있어도 자동 제거)
+  try {
+    const u = new URL(envRaw);
+    if (u.hostname.endsWith('.supabase.co') || u.hostname === 'localhost' || u.hostname === '127.0.0.1') {
+      return { url: u.origin, source: 'env', envRaw };
+    }
+  } catch { /* 빈 값·형식 오류 → 아래로 */ }
   const derived = deriveUrlFromKey(process.env.SUPABASE_SERVICE_ROLE_KEY);
   if (derived) return { url: derived, source: 'key', envRaw };
-  return { url: cleanEnv || null, source: envRaw ? 'env' : 'none', envRaw };
+  return { url: FALLBACK_URL, source: 'fallback', envRaw };
 }
 
 // 서버 전용 클라이언트 (service_role) — 절대 클라이언트로 내보내지 말 것
 export function db() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const { url } = resolveSupabaseUrl();
-  if (!url || !key) throw new Error('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 환경변수가 없습니다.');
-  return createClient(url, key, {
+  if (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY 환경변수가 없습니다.');
+  return createClient(resolveSupabaseUrl().url, key, {
     auth: { persistSession: false },
     // Next.js fetch 캐시 차단 — DB 응답은 항상 실시간
     global: { fetch: (input: any, init?: any) => fetch(input, { ...init, cache: 'no-store' }) },
