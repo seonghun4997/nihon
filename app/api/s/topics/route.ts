@@ -36,22 +36,28 @@ export async function PATCH(req: NextRequest) {
 
   // 주제를 고르면 예습 노트가 저절로 생김 (수업 전에도 루프 시동)
   const t = row?.topics?.[selected];
+  let noteId: string | null = null;
+  let speakCount = 0;
   if (t) {
     const title = `예습 · ${t.jp}`;
     const { data: exists } = await s.from('lessons').select('id').eq('student_id', sess.id).eq('lang', lang)
       .eq('lesson_date', for_date).eq('title', title).maybeSingle();
-    if (!exists) {
-      await s.from('lessons').insert({
+    if (exists) {
+      noteId = exists.id;
+    } else {
+      const { data: created } = await s.from('lessons').insert({
         student_id: sess.id, lang, lesson_date: for_date, title,
         raw_text: '(주제 카드에서 자동 생성된 예습 노트)',
         note: { expressions: (t.expressions || []).map((e: any) => ({ ...e, stuck: false })), grammar: [] },
-      });
-      const speaks = (t.expressions || []).slice(0, 5).map((e: any) => ({
-        student_id: sess.id, lang, text: String(e.jp || '').slice(0, 300),
-        reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: initialDue(),
-      })).filter((r: any) => r.text);
-      if (speaks.length) await s.from('speaks').upsert(speaks, { onConflict: 'student_id,lang,text', ignoreDuplicates: true });
+      }).select('id').single();
+      noteId = created?.id || null;
     }
+    const speaks = (t.expressions || []).slice(0, 5).map((e: any) => ({
+      student_id: sess.id, lang, text: String(e.jp || '').slice(0, 300),
+      reading: String(e.reading || ''), ko: String(e.ko || ''), stage: 0, next_due: initialDue(),
+    })).filter((r: any) => r.text);
+    speakCount = speaks.length;
+    if (speaks.length) await s.from('speaks').upsert(speaks, { onConflict: 'student_id,lang,text', ignoreDuplicates: true });
   }
-  return NextResponse.json({ ok: true, prepared: !!t });
+  return NextResponse.json({ ok: true, prepared: !!t, note_id: noteId, speak_count: speakCount });
 }
