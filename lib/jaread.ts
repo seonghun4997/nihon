@@ -31,30 +31,48 @@ function shouldAttach(t: any, prev: any | null): boolean {
   if (t.pos === '記号') return true; // 문장부호는 앞 어절에
   if (t.pos_detail_1 === '接尾') return true;
   if (t.pos === '動詞' && t.pos_detail_1 === '非自立') return true;
+  if (t.pos === '動詞' && t.basic_form === 'する' && prev.pos === '名詞') return true; // お願い+します
   if (t.pos === '名詞' && prev.pos === '名詞' && prev.pos_detail_1 !== '接尾') return true; // 복합명사 (Wi-Fi, 何分)
   return false;
 }
 
-/** 일본어 문장 → 어절 단위 가나 발음 (예: '迷子になってしまいました' → 'マイゴニ ナッテシマイマシタ') */
-export async function eojeolKana(jp: string): Promise<string | null> {
+/** 일본어 문장 → 어절 단위 [원문, 발음] 쌍 — 두 줄이 같은 경계로 매칭됨 */
+export async function eojeolPair(jp: string): Promise<{ jp: string; kana: string } | null> {
   try {
     const tk = await getTokenizer();
     const tokens = tk.tokenize(jp);
     if (!tokens?.length) return null;
-    const units: string[] = [];
+    const surf: string[] = [];
+    const read: string[] = [];
     let prev: any = null;
+    let pfxS = '', pfxR = ''; // 접두사(お·ご 등)는 다음 어절 앞에 붙임
     for (const t of tokens) {
       const piece = /^[〇○◯～]+$/.test(t.surface_form) ? t.surface_form
         : (t.reading && t.reading !== '*' ? t.reading : t.surface_form);
-      if (shouldAttach(t, prev) && units.length) units[units.length - 1] += piece;
-      else units.push(piece);
+      if (t.pos === '接頭詞') { pfxS += t.surface_form; pfxR += piece; prev = t; continue; }
+      if (shouldAttach(t, prev) && surf.length && !pfxS) {
+        surf[surf.length - 1] += t.surface_form;
+        read[read.length - 1] += piece;
+      } else {
+        surf.push(pfxS + t.surface_form);
+        read.push(pfxR + piece);
+        pfxS = ''; pfxR = '';
+      }
       prev = t;
     }
-    let out = units.join(' ').replace(/\s+([。、！？!?，．])/g, '$1');
-    for (const [re, to] of NANI_FIX) out = out.replace(re, to);
-    return out;
+    if (pfxS) { surf.push(pfxS); read.push(pfxR); }
+    const clean = (a: string[]) => a.join(' ').replace(/\s+([。、！？!?，．])/g, '$1');
+    let kana = clean(read);
+    for (const [re, to] of NANI_FIX) kana = kana.replace(re, to);
+    return { jp: clean(surf), kana };
   } catch (e: any) {
-    console.error("[jaread]", e?.message || e);
+    console.error('[jaread]', e?.message || e);
     return null; // 실패 시 호출부가 기존 방식으로 폴백
   }
+}
+
+/** (호환) 발음만 필요할 때 */
+export async function eojeolKana(jp: string): Promise<string | null> {
+  const p = await eojeolPair(jp);
+  return p ? p.kana : null;
 }
