@@ -7,7 +7,7 @@ export async function askClaude(system: string, messages: Msg[], maxTokens = 200
   if (!key) throw new Error('ANTHROPIC_API_KEY 환경변수가 없습니다.');
   const model = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch((process.env.ANTHROPIC_BASE_URL || 'https://api.anthropic.com') + '/v1/messages', {
     method: 'POST',
     headers: {
       'content-type': 'application/json',

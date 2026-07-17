@@ -24,6 +24,8 @@ export default async function Today() {
   const lesson = weekdays.includes(d);
   const beforeLesson = weekdays.includes((d + 1) % 7);
   const afterLesson = weekdays.includes((d + 6) % 7);
+  let nextTopicDate = addDaysStr(today, 1);
+  for (let i = 1; i <= 7; i++) { if (weekdays.includes((d + i) % 7)) { nextTopicDate = addDaysStr(today, i); break; } }
 
   const [{ count: dueWords }, { count: starred }, { data: talk }, { data: lastLesson }] = await Promise.all([
     s.from('words').select('id', { count: 'exact', head: true }).eq('student_id', sess.id).eq('lang', lang).eq('retired', false).lte('next_due', today),
@@ -84,16 +86,16 @@ export default async function Today() {
           </div>
         </div>
 
-        {beforeLesson && (
-          <div className="step now">
-            <div className="dot" />
-            <div className="card">
-              <div className="card-head"><div><div className="card-tag">수업 전날 밤</div><h2>내일 수업 주제 고르기</h2></div></div>
-              <p className="desc">최근 수업 흐름에서 주제 3개를 뽑아요. [선생님께 공유]로 카톡 복사도 가능.</p>
-              <TopicPicker forDate={addDaysStr(today, 1)} />
+        <div className={`step ${beforeLesson ? 'now' : ''}`}>
+          <div className="dot" />
+          <div className="card">
+            <div className="card-head">
+              <div><div className="card-tag">{beforeLesson ? '내일 수업 준비' : '언제든지'}</div><h2>수업 주제 뽑기</h2></div>
             </div>
+            <p className="desc">수업 기록이 <b>없어도</b> 목표("{pref.goal}") 기반으로 주제 3개를 만들어줘요. 하나 고르면 예습 노트가 저절로 생기고, 표현 5개는 말하기 큐로.</p>
+            <TopicPicker forDate={nextTopicDate} />
           </div>
-        )}
+        </div>
 
         <div className={`step ${talk?.done ? 'done' : afterLesson ? 'now' : ''}`}>
           <div className="dot" />
