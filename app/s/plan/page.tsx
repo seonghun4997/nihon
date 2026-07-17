@@ -5,6 +5,7 @@ import Topbar from '@/components/Topbar';
 import WeekdayPicker from '@/components/WeekdayPicker';
 import GoalForm from '@/components/GoalForm';
 import PhoneForm from '@/components/PhoneForm';
+import { APP_VERSION } from '@/lib/version';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +26,7 @@ export default async function Settings() {
   return (
     <>
       <Topbar lang={lang} />
-      <div className="eyebrow">Settings</div>
+      <div className="eyebrow">Settings · {APP_VERSION}</div>
       <h1 className="big">수업 <em>요일</em></h1>
       <div className="sub">요일을 켜두면 수업일·전날·다음날에 홈 카드와 문자가 그 시계로 돌아갑니다.</div>
 

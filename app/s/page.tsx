@@ -8,6 +8,7 @@ import PasteBox from '@/components/PasteBox';
 import TopicPicker from '@/components/TopicPicker';
 import Topbar from '@/components/Topbar';
 import GoalGauge from '@/components/GoalGauge';
+import { APP_VERSION } from '@/lib/version';
 import { prefOf } from '@/lib/prefs';
 
 export const dynamic = 'force-dynamic';
@@ -108,7 +109,7 @@ export default async function Today() {
           </div>
         </div>
       </div>
-      <p className="hintline" style={{ marginTop: 18, textAlign: 'center' }}>연속 {streak}일 진행 중 (언어 합산)</p>
+      <p className="hintline" style={{ marginTop: 18, textAlign: 'center' }}>연속 {streak}일 진행 중 (언어 합산) · <b style={{ color: 'var(--green)' }}>{APP_VERSION}</b></p>
     </>
   );
 }

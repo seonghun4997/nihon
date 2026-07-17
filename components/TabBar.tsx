@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { APP_VERSION } from "@/lib/version";
 
 // 오너 지정 대분류: 홈 · 복습 · 수업 · 예습 · 미디어 · 저장
 const TABS = [
@@ -26,6 +27,7 @@ export default function TabBar(_props: { role?: string }) {
           </Link>
         );
       })}
+      <div className="side-ver">{APP_VERSION}</div>
     </nav>
   );
 }
