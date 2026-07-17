@@ -4,6 +4,7 @@ import { db } from '@/lib/supabase';
 import { getSession } from '@/lib/session';
 import { formatKo } from '@/lib/dates';
 import Reading from '@/components/Reading';
+import { forceKoreanReading } from '@/lib/kana2ko';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,7 @@ export default async function NoteDetail({ params }: { params: { id: string } })
   if (!l) notFound();
   const { data: words } = await s.from('words').select('word, meaning').eq('lesson_id', l.id);
   const { data: confusions } = await s.from('confusions').select('text, count').eq('lesson_id', l.id);
-  const exprs: any[] = l.note?.expressions || [];
+  const exprs: any[] = (l.note?.expressions || []).map((e: any) => forceKoreanReading(e, l.lang || 'jp'));
   const grammar: any[] = l.note?.grammar || [];
 
   return (

@@ -5,6 +5,7 @@ import { generateTopicsFor } from '@/lib/topics';
 import { addDaysStr, todayStr } from '@/lib/dates';
 import { getLang } from '@/lib/lang';
 import { initialDue } from '@/lib/srs';
+import { forceKoreanReading } from '@/lib/kana2ko';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -18,7 +19,15 @@ export async function GET(req: NextRequest) {
     if (reroll) await db().from('topics').delete().eq('student_id', sess.id).eq('lang', getLang()).eq('for_date', forDate);
     const row = await generateTopicsFor(sess.id, forDate, getLang());
     if (!row) return NextResponse.json({ empty: true, reason: '주제 생성에 실패했어요 — 다시 시도해 주세요.' });
-    return NextResponse.json(row);
+    // 소급 변환: 예전에 저장된 히라가나 데이터도 화면엔 항상 한글로
+    const lang0 = getLang();
+    return NextResponse.json({
+      ...row,
+      topics: (row.topics || []).map((t: any) => ({
+        ...t,
+        expressions: (t.expressions || []).map((e: any) => forceKoreanReading(e, lang0)),
+      })),
+    });
   } catch (e: any) {
     return NextResponse.json({ error: '주제 생성 실패: ' + e.message }, { status: 502 });
   }

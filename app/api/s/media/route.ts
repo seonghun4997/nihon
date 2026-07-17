@@ -15,10 +15,15 @@ export const maxDuration = 60;
 export async function GET() {
   const sess = getSession();
   if (!sess) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  const lang0 = getLang();
   const { data } = await db().from('media_recs').select('*')
-    .eq('student_id', sess.id).eq('lang', getLang())
+    .eq('student_id', sess.id).eq('lang', lang0)
     .order('created_at', { ascending: false }).limit(10);
-  return NextResponse.json({ items: data || [] });
+  const items = (data || []).map((r) => ({
+    ...r,
+    expressions: (r.expressions || []).map((e: any) => forceKoreanReading(e, lang0)),
+  }));
+  return NextResponse.json({ items });
 }
 
 export async function POST(req: NextRequest) {
